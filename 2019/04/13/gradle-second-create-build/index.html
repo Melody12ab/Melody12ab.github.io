@@ -102,7 +102,7 @@
 <meta property="og:image" content="https://i.loli.net/2019/04/13/5cb1e9a1c4890.png">
 <meta property="og:image" content="https://i.loli.net/2019/04/13/5cb1fdc60b067.png">
 <meta property="og:image" content="https://docs.gradle.org/5.3.1/userguide/img/wrapper-workflow.png">
-<meta property="og:updated_time" content="2019-04-13T17:50:59.957Z">
+<meta property="og:updated_time" content="2019-04-14T08:43:06.051Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Gradle系列(二)-使用Gradle构建项目">
 <meta name="twitter:description" content="上一篇文章中简单介绍了一下Gradle，既然从扩展性、灵活性、性能方面都这么出色，那这次就动手尝试看看如何使用Gradle来构建项目。">
@@ -493,7 +493,7 @@
 <figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">build.gradle</span><br><span class="line">task wrapper(<span class="string">type:</span> Wrapper)&#123;</span><br><span class="line">    gradleVersion = <span class="string">'5.3.1'</span></span><br><span class="line">    distributionType = <span class="string">'bin'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><ol>
 <li>简单体验了下Gradle，感受到了其灵活和高度可定制，可折腾性不错。</li>
-<li>task和plugin是两个重要的东东。</li>
+<li>task和<a href="https://docs.gradle.org/current/userguide/plugins.html#plugins" target="_blank" rel="noopener">plugin</a>是两个重要的东东。</li>
 <li>Wrapper好用。</li>
 </ol>
 
