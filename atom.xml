@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://melody12ab.github.io/"/>
-  <updated>2019-04-14T08:43:06.051Z</updated>
+  <updated>2019-08-08T12:50:50.599Z</updated>
   <id>http://melody12ab.github.io/</id>
   
   <author>
@@ -15,6 +15,33 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>西行纪</title>
+    <link href="http://melody12ab.github.io/2019/08/07/xixingji/"/>
+    <id>http://melody12ab.github.io/2019/08/07/xixingji/</id>
+    <published>2019-08-07T05:56:55.000Z</published>
+    <updated>2019-08-08T12:50:50.599Z</updated>
+    
+    <content type="html"><![CDATA[<p><img src="https://i.loli.net/2019/08/08/GN4CnczeR8Tygq5.png" alt="西行纪"></p><p>这是一部看起来很过瘾的漫画，看过的少有的全彩漫画。</p><p>记得是看了一篇关于这部漫画的介绍，由于时间有点久了，里面吸引我的是“一个不一样的西游故事“，当时记得有点像是悟空传的剧情。</p><p>最后一看就停不下来了，颠覆了很多角色的认识，唐三藏，真实、潇洒、率性还很能打；白龙马-傲雪，胆小、暴戾，同时也有善良的一面；如来，观音是大帅哥，并且观音还有洁癖；沙悟净，外冷内热的法术师……。</p><p>故事的时间是我们知道的西游之后的故事，整体设定和剧情很别致，虽然以前了解过悟空传之类西游故事，不过真正看过后还是有很多乐趣。</p><p>印象比较深的有：</p><ol><li>唐三藏居然开了一家妓院，嗯，很有意思。</li><li>当上古三清和天庭光与暗势力正面冲突的时候，道德天尊调停的方式是将，光一方的大妖悟空杀掉，以促成暂时的和平，道德的最高点是如此的谄媚。</li><li>牛魔王和牛小妹的故事。</li></ol><p>整体是一部比较精彩的漫画，极好的打发时间的利器。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;&lt;img src=&quot;https://i.loli.net/2019/08/08/GN4CnczeR8Tygq5.png&quot; alt=&quot;西行纪&quot;&gt;&lt;/p&gt;
+&lt;p&gt;这是一部看起来很过瘾的漫画，看过的少有的全彩漫画。&lt;/p&gt;
+&lt;p&gt;记得是看了一篇关于这部漫画的介绍，由于时间有点久了
+      
+    
+    </summary>
+    
+      <category term="打发时间" scheme="http://melody12ab.github.io/categories/%E6%89%93%E5%8F%91%E6%97%B6%E9%97%B4/"/>
+    
+    
+      <category term="漫画" scheme="http://melody12ab.github.io/tags/%E6%BC%AB%E7%94%BB/"/>
+    
+  </entry>
   
   <entry>
     <title>Gradle系列(二)-使用Gradle构建项目</title>
