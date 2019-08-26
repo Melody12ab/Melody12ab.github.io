@@ -97,7 +97,7 @@
 <meta property="og:description" content="问题发现最近在做系统性能优化，发现系统中一处时间格式化方法耗时异常高。打开系统代码，翻看发现在codec中，处理上行时，每一个上行消息都会创建一个SimpleDateFormat对象，而SimpleDateFormat是一个线程不安全且性能有问题的一个类，业务代码以此来解析上报时间字符串。代码片段如下： 1234567String softTime = &quot;190812122359&quot;;try &amp;#1">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://i.loli.net/2019/08/12/DmvKU8onZd3XEJC.png">
-<meta property="og:updated_time" content="2019-08-26T13:17:31.263Z">
+<meta property="og:updated_time" content="2019-08-26T13:34:10.769Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java日期解析">
 <meta name="twitter:description" content="问题发现最近在做系统性能优化，发现系统中一处时间格式化方法耗时异常高。打开系统代码，翻看发现在codec中，处理上行时，每一个上行消息都会创建一个SimpleDateFormat对象，而SimpleDateFormat是一个线程不安全且性能有问题的一个类，业务代码以此来解析上报时间字符串。代码片段如下： 1234567String softTime = &quot;190812122359&quot;;try &amp;#1">
@@ -437,9 +437,9 @@
       
 
       
-        <h4 id="问题发现"><a href="#问题发现" class="headerlink" title="问题发现"></a>问题发现</h4><p>最近在做系统性能优化，发现系统中一处时间格式化方法耗时异常高。<img src="https://i.loli.net/2019/08/12/DmvKU8onZd3XEJC.png" alt="image.png">打开系统代码，翻看发现在codec中，处理上行时，每一个上行消息都会创建一个SimpleDateFormat对象，而SimpleDateFormat是一个线程不安全且性能有问题的一个类，业务代码以此来解析上报时间字符串。代码片段如下：</p>
+        <h3 id="问题发现"><a href="#问题发现" class="headerlink" title="问题发现"></a>问题发现</h3><p>最近在做系统性能优化，发现系统中一处时间格式化方法耗时异常高。<img src="https://i.loli.net/2019/08/12/DmvKU8onZd3XEJC.png" alt="image.png">打开系统代码，翻看发现在codec中，处理上行时，每一个上行消息都会创建一个SimpleDateFormat对象，而SimpleDateFormat是一个线程不安全且性能有问题的一个类，业务代码以此来解析上报时间字符串。代码片段如下：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">String softTime = <span class="string">"190812122359"</span>;</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    DateFormat format = <span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyMMddHHmmss"</span>);</span><br><span class="line">    Date date = format.parse(softTime);</span><br><span class="line">&#125; <span class="keyword">catch</span> (ParseException e) &#123;</span><br><span class="line">    <span class="comment">//省略……</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<h4 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h4><p>一开始由于对JDK 8提供的日期函数不熟悉，直接上了joda-time，由于joda的DateTimeFormatter创建层面进行了池化处理，增加如下方法，以修复重复创建的性能问题：</p>
+<h3 id="问题解决"><a href="#问题解决" class="headerlink" title="问题解决"></a>问题解决</h3><p>一开始由于对JDK 8提供的日期函数不熟悉，直接上了joda-time，由于joda的DateTimeFormatter创建层面进行了池化处理，增加如下方法，以修复重复创建的性能问题：</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">long</span> <span class="title">parseDeviceTime</span><span class="params">(String softTime)</span></span>&#123;</span><br><span class="line">    DateTimeFormatter dfm = DateTimeFormat.forPattern(<span class="string">"yyMMddHHmmss"</span>);</span><br><span class="line">    DateTime dateTime = dfm.parseDateTime(softTime);</span><br><span class="line">    <span class="keyword">return</span> dateTime.getMillis();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="问题复现"><a href="#问题复现" class="headerlink" title="问题复现"></a>问题复现</h3><p>经过以上修改，问题得以解决，但又发现了新的问题：joda-time在parse时间字符串时，无法兼容60秒这种场景，如’2019-08-12 11:30:60’，遇到这类字符串joda会直接抛出异常，这就是一个比较坑的地方，明明可能抛出异常，但却没有在方法签名中声名，导致使用方未进行catch，进而中断主流程。同时测试发现JDK 8的时间API亦有相同问题。</p>
 <h3 id="问题解决-1"><a href="#问题解决-1" class="headerlink" title="问题解决"></a>问题解决</h3><p>重新考虑使用SimpleDateFormat，对于重复创建问题，使用共享同一实例解决，针对多线程问题，使用ThreadLocal。修改代码如下：</p>
@@ -678,7 +678,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#问题发现"><span class="nav-number">1.</span> <span class="nav-text">问题发现</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#问题解决"><span class="nav-number">2.</span> <span class="nav-text">问题解决</span></a></li></ol><li class="nav-item nav-level-3"><a class="nav-link" href="#问题复现"><span class="nav-number"></span> <span class="nav-text">问题复现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题解决-1"><span class="nav-number"></span> <span class="nav-text">问题解决</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number"></span> <span class="nav-text">总结</span></a></li></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#问题发现"><span class="nav-number">1.</span> <span class="nav-text">问题发现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题解决"><span class="nav-number">2.</span> <span class="nav-text">问题解决</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题复现"><span class="nav-number">3.</span> <span class="nav-text">问题复现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#问题解决-1"><span class="nav-number">4.</span> <span class="nav-text">问题解决</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
 
           </div>
