@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[Java日期解析]]></title>
+    <url>%2F2019%2F08%2F12%2FdateFormat%2F</url>
+    <content type="text"><![CDATA[问题发现最近在做系统性能优化，发现系统中一处时间格式化方法耗时异常高。打开系统代码，翻看发现在codec中，处理上行时，每一个上行消息都会创建一个SimpleDateFormat对象，而SimpleDateFormat是一个线程不安全且性能有问题的一个类，业务代码以此来解析上报时间字符串。代码片段如下： 1234567String softTime = "190812122359";try &#123; DateFormat format = new SimpleDateFormat("yyMMddHHmmss"); Date date = format.parse(softTime);&#125; catch (ParseException e) &#123; //省略……&#125; 问题解决一开始由于对JDK 8提供的日期函数不熟悉，直接上了joda-time，由于joda的DateTimeFormatter创建层面进行了池化处理，增加如下方法，以修复重复创建的性能问题： 12345private static long parseDeviceTime(String softTime)&#123; DateTimeFormatter dfm = DateTimeFormat.forPattern("yyMMddHHmmss"); DateTime dateTime = dfm.parseDateTime(softTime); return dateTime.getMillis();&#125; 问题复现经过以上修改，问题得以解决，但又发现了新的问题：joda-time在parse时间字符串时，无法兼容60秒这种场景，如’2019-08-12 11:30:60’，遇到这类字符串joda会直接抛出异常，这就是一个比较坑的地方，明明可能抛出异常，但却没有在方法签名中声名，导致使用方未进行catch，进而中断主流程。同时测试发现JDK 8的时间API亦有相同问题。 问题解决重新考虑使用SimpleDateFormat，对于重复创建问题，使用共享同一实例解决，针对多线程问题，使用ThreadLocal。修改代码如下： 12345678910private static ThreadLocal&lt;SimpleDateFormat&gt; local = new ThreadLocal&lt;SimpleDateFormat&gt;() &#123; @Override protected SimpleDateFormat initialValue() &#123; return new SimpleDateFormat("yyMMddHHmmss"); &#125;&#125;; public static Date parse(String dateStr) throws Exception &#123; return local.get().parse(dateStr);&#125; 总结 SimpleDateFormat存在性能问题，且线程不安全，使用需谨慎。 SimpleDateFormat往JDK 8或joda迁移时，主要考虑兼容性，如老业务场景中是否存在代码时间为60s的场景等。 在写代码时，方法如果有没有handle的异常，需要在签名中声明，以防使用方使用不当。]]></content>
+      <categories>
+        <category>date</category>
+      </categories>
+      <tags>
+        <tag>date</tag>
+        <tag>SimpleDateFormat</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[西行纪]]></title>
     <url>%2F2019%2F08%2F07%2Fxixingji%2F</url>
     <content type="text"><![CDATA[这是一部看起来很过瘾的漫画，看过的少有的全彩漫画。 记得是看了一篇关于这部漫画的介绍，由于时间有点久了，里面吸引我的是“一个不一样的西游故事“，当时记得有点像是悟空传的剧情。 最后一看就停不下来了，颠覆了很多角色的认识，唐三藏，真实、潇洒、率性还很能打；白龙马-傲雪，胆小、暴戾，同时也有善良的一面；如来，观音是大帅哥，并且观音还有洁癖；沙悟净，外冷内热的法术师……。 故事的时间是我们知道的西游之后的故事，整体设定和剧情很别致，虽然以前了解过悟空传之类西游故事，不过真正看过后还是有很多乐趣。 印象比较深的有： 唐三藏居然开了一家妓院，嗯，很有意思。 当上古三清和天庭光与暗势力正面冲突的时候，道德天尊调停的方式是将，光一方的大妖悟空杀掉，以促成暂时的和平，道德的最高点是如此的谄媚。 牛魔王和牛小妹的故事。 整体是一部比较精彩的漫画，极好的打发时间的利器。]]></content>
