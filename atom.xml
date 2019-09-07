@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://melody12ab.github.io/"/>
-  <updated>2019-08-26T13:34:10.769Z</updated>
+  <updated>2019-09-04T06:06:06.424Z</updated>
   <id>http://melody12ab.github.io/</id>
   
   <author>
@@ -15,6 +15,32 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>压测总结</title>
+    <link href="http://melody12ab.github.io/2019/08/26/aboout-bench/"/>
+    <id>http://melody12ab.github.io/2019/08/26/aboout-bench/</id>
+    <published>2019-08-26T13:37:44.000Z</published>
+    <updated>2019-09-04T06:06:06.424Z</updated>
+    
+    <content type="html"><![CDATA[<p>最近对线上TCP系统做了一次压测，借这次机会从流程和工具方面总结下这次压测。<br><img src="https://i.loli.net/2019/09/04/hDITG1d7C4KAyOi.png" alt="压测流程"></p><h3 id="压测流程"><a href="#压测流程" class="headerlink" title="压测流程"></a>压测流程</h3><h4 id="1-搞清楚背景"><a href="#1-搞清楚背景" class="headerlink" title="1.搞清楚背景"></a>1.搞清楚背景</h4><p>搞清楚为什么要进行压测，大背景是什么。清楚的理解背景之后才能帮助我们更好的去设计压测方案。</p><h4 id="2-制定目标"><a href="#2-制定目标" class="headerlink" title="2.制定目标"></a>2.制定目标</h4><p>根据背景，制定可量化的目标，可以考虑从系统和业务两个方向去考虑，比如稳定在线数、QPS、CPU负载、GC等。大部分压测并不是冒烟测试，而是需要去探测当前业务量猛然增加比如N倍之后，系统是否可以稳定运行。因此一个清晰目标往往也告诉了我们当前次压测的重点和终点在哪里。</p><h4 id="3-梳理系统流程"><a href="#3-梳理系统流程" class="headerlink" title="3.梳理系统流程"></a>3.梳理系统流程</h4><p>在制定压测方案之前，需要我们对待压系统进行系统的梳理，根据目标，梳理待压系统的业务流程，数据流，线程模型等等。清晰的系统流程可以帮助我们有针对的设计压测方案，同时也可以帮助我们对压测问题进行定位优化。对系统不清楚的情况下，虽然可以做黑盒压测，但是很难去针对性的进行优化，而我们之所以进行压测，往往都伴随着优化任务，因此建议不管什么情况下，先建议梳理清楚系统。</p><h4 id="4-制定压测方案"><a href="#4-制定压测方案" class="headerlink" title="4.制定压测方案"></a>4.制定压测方案</h4><p>很多时候有了对目标和系统清晰的认识，压测方案相对也就出来了，这里建议可以多设计几个方案，明确各方案优劣势，可以拉有经验的大佬讨论一下，充分考虑各种场景，相信这样出来的方案也会是一个经得起推敲和挑战的方案了。方案中需要包括但不限于：压测环境需求，系统参数调优，数据隔离方案，监控方案。</p><h4 id="5-制定方案实施计划-amp-实施压测"><a href="#5-制定方案实施计划-amp-实施压测" class="headerlink" title="5.制定方案实施计划&amp;实施压测"></a>5.制定方案实施计划&amp;实施压测</h4><p>至此到了实操环境了，根据压测方案步骤，实施压测计划，可能包括了环境准备，参数调整，各种中间件环境隔离及系统压测环境改造等等，由于涉及到的事情比较杂，可以通过系统的方式将这些事情可视化的管理起来，方便进度追踪。</p><h4 id="6-问题发现及解决"><a href="#6-问题发现及解决" class="headerlink" title="6.问题发现及解决"></a>6.问题发现及解决</h4><p>压测的过程一般都伴随着问题的暴露，监控不完善，性能问题，限流告警等等，这个时候需要将这个问题都记录并管理起来，分好个问题优先级，制定跟踪人，解决时间，直至后续闭环解决。</p><h4 id="7-结论产出及压测报告产出"><a href="#7-结论产出及压测报告产出" class="headerlink" title="7.结论产出及压测报告产出"></a>7.结论产出及压测报告产出</h4><p>整理以上各个步骤产出，从背景，目标，方案，实施，问题，结论等方面系统全面呈现压测情况，报告需要逻辑清洗，有理有据，有说服力。</p><h4 id="8-总结沉淀"><a href="#8-总结沉淀" class="headerlink" title="8.总结沉淀"></a>8.总结沉淀</h4><p>经过以上各个步骤后，产生的一些想法，总结做的好的，做的不好的点，规划接下来需要做的事情，沉淀方法论。</p><h3 id="工具"><a href="#工具" class="headerlink" title="工具"></a>工具</h3><ol><li><p><a href="https://jmeter.apache.org/" target="_blank" rel="noopener">JMeter</a>：Apache组织开发的基于Java的压力测试工具，可用于测试静态和动态资源，也可以用于对服务器、网络或对象模拟巨大的负载，同时还能够对应用程序做功能/回归测试。</p><ul><li>优点：简单方便，功能完善，开源。</li><li>缺点：问题排查不如自己写的测试工具方便。</li></ul></li><li><p><a href="http://tsung.erlang-projects.org/" target="_blank" rel="noopener">Tsung</a>：Tsung是erlang开发的一款开源多协议分布式负载并发测试工具，可用作HTTP、WebDAV、SOAP、PostgreSQL、MySQL、LDAP和Jabber/XMPP的服务器压力测试。</p><ul><li>优点：功能强大，相对透明。</li><li>缺点：使用成本相较于JMeter更高。</li></ul></li><li><p>自定义压测客户端：完全可控，高度灵活。</p><ul><li>优点：灵活，可控。</li><li>缺点：开发设计成本高。</li></ul></li></ol>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;最近对线上TCP系统做了一次压测，借这次机会从流程和工具方面总结下这次压测。&lt;br&gt;&lt;img src=&quot;https://i.loli.net/2019/09/04/hDITG1d7C4KAyOi.png&quot; alt=&quot;压测流程&quot;&gt;&lt;/p&gt;
+&lt;h3 id=&quot;压测流程&quot;&gt;&lt;a h
+      
+    
+    </summary>
+    
+      <category term="压测" scheme="http://melody12ab.github.io/categories/%E5%8E%8B%E6%B5%8B/"/>
+    
+    
+      <category term="压测" scheme="http://melody12ab.github.io/tags/%E5%8E%8B%E6%B5%8B/"/>
+    
+  </entry>
   
   <entry>
     <title>Java日期解析</title>

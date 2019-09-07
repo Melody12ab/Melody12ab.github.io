@@ -1,6 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title><![CDATA[压测总结]]></title>
+    <url>%2F2019%2F08%2F26%2Faboout-bench%2F</url>
+    <content type="text"><![CDATA[最近对线上TCP系统做了一次压测，借这次机会从流程和工具方面总结下这次压测。 压测流程1.搞清楚背景搞清楚为什么要进行压测，大背景是什么。清楚的理解背景之后才能帮助我们更好的去设计压测方案。 2.制定目标根据背景，制定可量化的目标，可以考虑从系统和业务两个方向去考虑，比如稳定在线数、QPS、CPU负载、GC等。大部分压测并不是冒烟测试，而是需要去探测当前业务量猛然增加比如N倍之后，系统是否可以稳定运行。因此一个清晰目标往往也告诉了我们当前次压测的重点和终点在哪里。 3.梳理系统流程在制定压测方案之前，需要我们对待压系统进行系统的梳理，根据目标，梳理待压系统的业务流程，数据流，线程模型等等。清晰的系统流程可以帮助我们有针对的设计压测方案，同时也可以帮助我们对压测问题进行定位优化。对系统不清楚的情况下，虽然可以做黑盒压测，但是很难去针对性的进行优化，而我们之所以进行压测，往往都伴随着优化任务，因此建议不管什么情况下，先建议梳理清楚系统。 4.制定压测方案很多时候有了对目标和系统清晰的认识，压测方案相对也就出来了，这里建议可以多设计几个方案，明确各方案优劣势，可以拉有经验的大佬讨论一下，充分考虑各种场景，相信这样出来的方案也会是一个经得起推敲和挑战的方案了。方案中需要包括但不限于：压测环境需求，系统参数调优，数据隔离方案，监控方案。 5.制定方案实施计划&amp;实施压测至此到了实操环境了，根据压测方案步骤，实施压测计划，可能包括了环境准备，参数调整，各种中间件环境隔离及系统压测环境改造等等，由于涉及到的事情比较杂，可以通过系统的方式将这些事情可视化的管理起来，方便进度追踪。 6.问题发现及解决压测的过程一般都伴随着问题的暴露，监控不完善，性能问题，限流告警等等，这个时候需要将这个问题都记录并管理起来，分好个问题优先级，制定跟踪人，解决时间，直至后续闭环解决。 7.结论产出及压测报告产出整理以上各个步骤产出，从背景，目标，方案，实施，问题，结论等方面系统全面呈现压测情况，报告需要逻辑清洗，有理有据，有说服力。 8.总结沉淀经过以上各个步骤后，产生的一些想法，总结做的好的，做的不好的点，规划接下来需要做的事情，沉淀方法论。 工具 JMeter：Apache组织开发的基于Java的压力测试工具，可用于测试静态和动态资源，也可以用于对服务器、网络或对象模拟巨大的负载，同时还能够对应用程序做功能/回归测试。 优点：简单方便，功能完善，开源。 缺点：问题排查不如自己写的测试工具方便。 Tsung：Tsung是erlang开发的一款开源多协议分布式负载并发测试工具，可用作HTTP、WebDAV、SOAP、PostgreSQL、MySQL、LDAP和Jabber/XMPP的服务器压力测试。 优点：功能强大，相对透明。 缺点：使用成本相较于JMeter更高。 自定义压测客户端：完全可控，高度灵活。 优点：灵活，可控。 缺点：开发设计成本高。]]></content>
+      <categories>
+        <category>压测</category>
+      </categories>
+      <tags>
+        <tag>压测</tag>
+      </tags>
+  </entry>
+  <entry>
     <title><![CDATA[Java日期解析]]></title>
     <url>%2F2019%2F08%2F12%2FdateFormat%2F</url>
     <content type="text"><![CDATA[问题发现最近在做系统性能优化，发现系统中一处时间格式化方法耗时异常高。打开系统代码，翻看发现在codec中，处理上行时，每一个上行消息都会创建一个SimpleDateFormat对象，而SimpleDateFormat是一个线程不安全且性能有问题的一个类，业务代码以此来解析上报时间字符串。代码片段如下： 1234567String softTime = "190812122359";try &#123; DateFormat format = new SimpleDateFormat("yyMMddHHmmss"); Date date = format.parse(softTime);&#125; catch (ParseException e) &#123; //省略……&#125; 问题解决一开始由于对JDK 8提供的日期函数不熟悉，直接上了joda-time，由于joda的DateTimeFormatter创建层面进行了池化处理，增加如下方法，以修复重复创建的性能问题： 12345private static long parseDeviceTime(String softTime)&#123; DateTimeFormatter dfm = DateTimeFormat.forPattern("yyMMddHHmmss"); DateTime dateTime = dfm.parseDateTime(softTime); return dateTime.getMillis();&#125; 问题复现经过以上修改，问题得以解决，但又发现了新的问题：joda-time在parse时间字符串时，无法兼容60秒这种场景，如’2019-08-12 11:30:60’，遇到这类字符串joda会直接抛出异常，这就是一个比较坑的地方，明明可能抛出异常，但却没有在方法签名中声名，导致使用方未进行catch，进而中断主流程。同时测试发现JDK 8的时间API亦有相同问题。 问题解决重新考虑使用SimpleDateFormat，对于重复创建问题，使用共享同一实例解决，针对多线程问题，使用ThreadLocal。修改代码如下： 12345678910private static ThreadLocal&lt;SimpleDateFormat&gt; local = new ThreadLocal&lt;SimpleDateFormat&gt;() &#123; @Override protected SimpleDateFormat initialValue() &#123; return new SimpleDateFormat("yyMMddHHmmss"); &#125;&#125;; public static Date parse(String dateStr) throws Exception &#123; return local.get().parse(dateStr);&#125; 总结 SimpleDateFormat存在性能问题，且线程不安全，使用需谨慎。 SimpleDateFormat往JDK 8或joda迁移时，主要考虑兼容性，如老业务场景中是否存在代码时间为60s的场景等。 在写代码时，方法如果有没有handle的异常，需要在签名中声明，以防使用方使用不当。]]></content>

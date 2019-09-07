@@ -75,7 +75,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="压测,">
 
 
 
@@ -88,17 +88,20 @@
 
 
 
-<meta name="description" content="大妈笔记">
-<meta name="keywords" content="java gradle">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Bigface Monster">
-<meta property="og:url" content="http://melody12ab.github.io/tags/machine-learning/index.html">
+<meta name="description" content="最近对线上TCP系统做了一次压测，借这次机会从流程和工具方面总结下这次压测。 压测流程1.搞清楚背景搞清楚为什么要进行压测，大背景是什么。清楚的理解背景之后才能帮助我们更好的去设计压测方案。 2.制定目标根据背景，制定可量化的目标，可以考虑从系统和业务两个方向去考虑，比如稳定在线数、QPS、CPU负载、GC等。大部分压测并不是冒烟测试，而是需要去探测当前业务量猛然增加比如N倍之后，系统是否可以稳定">
+<meta name="keywords" content="压测">
+<meta property="og:type" content="article">
+<meta property="og:title" content="压测总结">
+<meta property="og:url" content="http://melody12ab.github.io/2019/08/26/aboout-bench/index.html">
 <meta property="og:site_name" content="Bigface Monster">
-<meta property="og:description" content="大妈笔记">
+<meta property="og:description" content="最近对线上TCP系统做了一次压测，借这次机会从流程和工具方面总结下这次压测。 压测流程1.搞清楚背景搞清楚为什么要进行压测，大背景是什么。清楚的理解背景之后才能帮助我们更好的去设计压测方案。 2.制定目标根据背景，制定可量化的目标，可以考虑从系统和业务两个方向去考虑，比如稳定在线数、QPS、CPU负载、GC等。大部分压测并不是冒烟测试，而是需要去探测当前业务量猛然增加比如N倍之后，系统是否可以稳定">
 <meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://i.loli.net/2019/09/04/hDITG1d7C4KAyOi.png">
+<meta property="og:updated_time" content="2019-09-04T06:06:06.424Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Bigface Monster">
-<meta name="twitter:description" content="大妈笔记">
+<meta name="twitter:title" content="压测总结">
+<meta name="twitter:description" content="最近对线上TCP系统做了一次压测，借这次机会从流程和工具方面总结下这次压测。 压测流程1.搞清楚背景搞清楚为什么要进行压测，大背景是什么。清楚的理解背景之后才能帮助我们更好的去设计压测方案。 2.制定目标根据背景，制定可量化的目标，可以考虑从系统和业务两个方向去考虑，比如稳定在线数、QPS、CPU负载、GC等。大部分压测并不是冒烟测试，而是需要去探测当前业务量猛然增加比如N倍之后，系统是否可以稳定">
+<meta name="twitter:image" content="https://i.loli.net/2019/09/04/hDITG1d7C4KAyOi.png">
 
 
 
@@ -128,13 +131,13 @@
 
 
 
-  <link rel="canonical" href="http://melody12ab.github.io/tags/machine-learning/">
+  <link rel="canonical" href="http://melody12ab.github.io/2019/08/26/aboout-bench/">
 
 
 
 
 
-  <title>标签: machine learning | Bigface Monster</title>
+  <title>压测总结 | Bigface Monster</title>
   
 
 
@@ -163,7 +166,7 @@
     
   
 
-  <div class="container sidebar-position-left ">
+  <div class="container sidebar-position-left page-post-detail">
     <div class="headband"></div>
 	<a href="https://github.com/Melody12ab" class="github-corner" aria-label="View source on GitHub"><svg width="80" height="80" viewbox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; left: 0; transform: scale(-1, 1);" aria-hidden="true"><path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"/><path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"/><path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"/></svg><style>.github-corner:hover .octo-arm{animation:octocat-wave 560ms ease-in-out}@keyframes octocat-wave{0%,100%{transform:rotate(0)}20%,60%{transform:rotate(-25deg)}40%,80%{transform:rotate(10deg)}}@media (max-width:500px){.github-corner:hover .octo-arm{animation:none}.github-corner .octo-arm{animation:octocat-wave 560ms ease-in-out}}</style></a>
 
@@ -290,52 +293,249 @@
           <div id="content" class="content">
             
 
-  
-  
-  
-  <div class="post-block tag">
+  <div id="posts" class="posts-expand">
+    
 
-    <div id="posts" class="posts-collapse">
-      <div class="collection-title">
-        <h2>machine learning<small>标签</small>
-        </h2>
-      </div>
+  
 
-      
-        
+  
+  
+  
 
   <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-    <header class="post-header">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://melody12ab.github.io/2019/08/26/aboout-bench/">
 
-      <h3 class="post-title">
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Bigface Monster">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/melodyicon.jpg">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Bigface Monster">
+    </span>
+
+    
+      <header class="post-header">
+
         
-            <a class="post-title-link" href="/2018/04/19/one-hot-encoding/" itemprop="url">
-              
-                <span itemprop="name">机器学习 数据预处理之One-Hot Encoding</span>
-              
-            </a>
         
-      </h3>
+          <h2 class="post-title" itemprop="name headline">压测总结</h2>
+        
 
-      <div class="post-meta">
-        <time class="post-time" itemprop="dateCreated" datetime="2018-04-19T22:11:28+08:00" content="2018-04-19">
-          04-19
-        </time>
-      </div>
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-08-26T21:37:44+08:00">
+                2019-08-26
+              </time>
+            
 
-    </header>
-  </article>
+            
 
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/压测/" itemprop="url" rel="index">
+                    <span itemprop="name">压测</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+              <span class="post-comments-count">
+                <span class="post-meta-divider">|</span>
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-comment-o"></i>
+                </span>
+                <a href="/2019/08/26/aboout-bench/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count valine-comment-count" data-xid="/2019/08/26/aboout-bench/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+          
+
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  1k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  3
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p>最近对线上TCP系统做了一次压测，借这次机会从流程和工具方面总结下这次压测。<br><img src="https://i.loli.net/2019/09/04/hDITG1d7C4KAyOi.png" alt="压测流程"></p>
+<h3 id="压测流程"><a href="#压测流程" class="headerlink" title="压测流程"></a>压测流程</h3><h4 id="1-搞清楚背景"><a href="#1-搞清楚背景" class="headerlink" title="1.搞清楚背景"></a>1.搞清楚背景</h4><p>搞清楚为什么要进行压测，大背景是什么。清楚的理解背景之后才能帮助我们更好的去设计压测方案。</p>
+<h4 id="2-制定目标"><a href="#2-制定目标" class="headerlink" title="2.制定目标"></a>2.制定目标</h4><p>根据背景，制定可量化的目标，可以考虑从系统和业务两个方向去考虑，比如稳定在线数、QPS、CPU负载、GC等。大部分压测并不是冒烟测试，而是需要去探测当前业务量猛然增加比如N倍之后，系统是否可以稳定运行。因此一个清晰目标往往也告诉了我们当前次压测的重点和终点在哪里。</p>
+<h4 id="3-梳理系统流程"><a href="#3-梳理系统流程" class="headerlink" title="3.梳理系统流程"></a>3.梳理系统流程</h4><p>在制定压测方案之前，需要我们对待压系统进行系统的梳理，根据目标，梳理待压系统的业务流程，数据流，线程模型等等。清晰的系统流程可以帮助我们有针对的设计压测方案，同时也可以帮助我们对压测问题进行定位优化。对系统不清楚的情况下，虽然可以做黑盒压测，但是很难去针对性的进行优化，而我们之所以进行压测，往往都伴随着优化任务，因此建议不管什么情况下，先建议梳理清楚系统。</p>
+<h4 id="4-制定压测方案"><a href="#4-制定压测方案" class="headerlink" title="4.制定压测方案"></a>4.制定压测方案</h4><p>很多时候有了对目标和系统清晰的认识，压测方案相对也就出来了，这里建议可以多设计几个方案，明确各方案优劣势，可以拉有经验的大佬讨论一下，充分考虑各种场景，相信这样出来的方案也会是一个经得起推敲和挑战的方案了。方案中需要包括但不限于：压测环境需求，系统参数调优，数据隔离方案，监控方案。</p>
+<h4 id="5-制定方案实施计划-amp-实施压测"><a href="#5-制定方案实施计划-amp-实施压测" class="headerlink" title="5.制定方案实施计划&amp;实施压测"></a>5.制定方案实施计划&amp;实施压测</h4><p>至此到了实操环境了，根据压测方案步骤，实施压测计划，可能包括了环境准备，参数调整，各种中间件环境隔离及系统压测环境改造等等，由于涉及到的事情比较杂，可以通过系统的方式将这些事情可视化的管理起来，方便进度追踪。</p>
+<h4 id="6-问题发现及解决"><a href="#6-问题发现及解决" class="headerlink" title="6.问题发现及解决"></a>6.问题发现及解决</h4><p>压测的过程一般都伴随着问题的暴露，监控不完善，性能问题，限流告警等等，这个时候需要将这个问题都记录并管理起来，分好个问题优先级，制定跟踪人，解决时间，直至后续闭环解决。</p>
+<h4 id="7-结论产出及压测报告产出"><a href="#7-结论产出及压测报告产出" class="headerlink" title="7.结论产出及压测报告产出"></a>7.结论产出及压测报告产出</h4><p>整理以上各个步骤产出，从背景，目标，方案，实施，问题，结论等方面系统全面呈现压测情况，报告需要逻辑清洗，有理有据，有说服力。</p>
+<h4 id="8-总结沉淀"><a href="#8-总结沉淀" class="headerlink" title="8.总结沉淀"></a>8.总结沉淀</h4><p>经过以上各个步骤后，产生的一些想法，总结做的好的，做的不好的点，规划接下来需要做的事情，沉淀方法论。</p>
+<h3 id="工具"><a href="#工具" class="headerlink" title="工具"></a>工具</h3><ol>
+<li><p><a href="https://jmeter.apache.org/" target="_blank" rel="noopener">JMeter</a>：Apache组织开发的基于Java的压力测试工具，可用于测试静态和动态资源，也可以用于对服务器、网络或对象模拟巨大的负载，同时还能够对应用程序做功能/回归测试。</p>
+<ul>
+<li>优点：简单方便，功能完善，开源。</li>
+<li>缺点：问题排查不如自己写的测试工具方便。</li>
+</ul>
+</li>
+<li><p><a href="http://tsung.erlang-projects.org/" target="_blank" rel="noopener">Tsung</a>：Tsung是erlang开发的一款开源多协议分布式负载并发测试工具，可用作HTTP、WebDAV、SOAP、PostgreSQL、MySQL、LDAP和Jabber/XMPP的服务器压力测试。</p>
+<ul>
+<li>优点：功能强大，相对透明。</li>
+<li>缺点：使用成本相较于JMeter更高。</li>
+</ul>
+</li>
+<li><p>自定义压测客户端：完全可控，高度灵活。</p>
+<ul>
+<li>优点：灵活，可控。</li>
+<li>缺点：开发设计成本高。</li>
+</ul>
+</li>
+</ol>
 
       
     </div>
+    
+    
+    
 
+<div>
+  
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:14px;">-------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------</div>
+    
+</div>
+
+  
+</div>
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/压测/" rel="tag"><i class="fa fa-tag"></i> 压测</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/08/12/dateFormat/" rel="next" title="Java日期解析">
+                <i class="fa fa-chevron-left"></i> Java日期解析
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
   </div>
   
   
   
+  </article>
 
-  
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
 
 
           </div>
@@ -343,6 +543,13 @@
 
 
           
+
+  
+    <div class="comments" id="comments">
+    </div>
+  
+
+
 
         </div>
         
@@ -363,8 +570,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -467,6 +683,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#压测流程"><span class="nav-number">1.</span> <span class="nav-text">压测流程</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-搞清楚背景"><span class="nav-number">1.1.</span> <span class="nav-text">1.搞清楚背景</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-制定目标"><span class="nav-number">1.2.</span> <span class="nav-text">2.制定目标</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#3-梳理系统流程"><span class="nav-number">1.3.</span> <span class="nav-text">3.梳理系统流程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#4-制定压测方案"><span class="nav-number">1.4.</span> <span class="nav-text">4.制定压测方案</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#5-制定方案实施计划-amp-实施压测"><span class="nav-number">1.5.</span> <span class="nav-text">5.制定方案实施计划&amp;实施压测</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#6-问题发现及解决"><span class="nav-number">1.6.</span> <span class="nav-text">6.问题发现及解决</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#7-结论产出及压测报告产出"><span class="nav-number">1.7.</span> <span class="nav-text">7.结论产出及压测报告产出</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#8-总结沉淀"><span class="nav-number">1.8.</span> <span class="nav-text">8.总结沉淀</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#工具"><span class="nav-number">2.</span> <span class="nav-text">工具</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       
@@ -601,6 +833,10 @@
   
 
   
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
 
   
 
